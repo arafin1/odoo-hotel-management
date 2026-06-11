@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_hotel_reservation_tree" model="ir.ui.view">
+        <field name="name">hotel.reservation.tree</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <tree string="Reservations">
+                <field name="currency_id" invisible="1"/>
+                <field name="customer_id"/>
+                <field name="room_id"/>
+                <field name="checkin_date"/>
+                <field name="checkout_date"/>
+                <field name="night_count"/>
+                <field name="amount_subtotal"/>
+                <field name="discount_amount"/>
+                <field name="tax_amount"/>
+                <field name="amount_total"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'confirmed'" decoration-success="state == 'checked_in'" decoration-muted="state == 'checked_out'" decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_form" model="ir.ui.view">
+        <field name="name">hotel.reservation.form</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Reservation Form">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_checkin" string="Check In" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_checkout" string="Check Out" type="object" class="oe_highlight" invisible="state != 'checked_in'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state not in ('draft', 'confirmed')"/>
+                    <button name="%(action_report_hotel_reservation_invoice)d" string="Invoice PDF" type="action"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,checked_in,checked_out"/>
+                </header>
+                <sheet>
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="customer_id"/>
+                            <field name="room_id"/>
+                        </group>
+                        <group>
+                            <field name="checkin_date"/>
+                            <field name="checkout_date"/>
+                            <field name="night_count"/>
+                            <field name="price_per_night"/>
+                            <field name="amount_subtotal"/>
+                            <field name="discount_amount"/>
+                            <field name="tax_rate"/>
+                            <field name="tax_amount"/>
+                            <field name="amount_total"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_reservation" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">hotel.reservation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_hotel_mgmt_root" name="Hotel Management" sequence="10"/>
+    <menuitem id="menu_hotel_reservation" name="Reservations" parent="menu_hotel_mgmt_root" action="action_hotel_reservation" sequence="10"/>
+
+</odoo>

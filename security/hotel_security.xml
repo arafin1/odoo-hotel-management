@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define the main application category -->
+    <record id="module_category_hotel" model="ir.module.category">
+        <field name="name">Hotel Management</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Group 1: Front Desk User / Staff -->
+    <record id="group_hotel_user" model="res.groups">
+        <field name="name">User / Staff</field>
+        <field name="category_id" ref="module_category_hotel"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Group 2: Hotel Manager -->
+    <record id="group_hotel_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_hotel"/>
+        <field name="implied_ids" eval="[(4, ref('group_hotel_user'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- ==================== RECORD RULES ==================== -->
+
+    <!-- Rule 1: Staff can only see reservations they created -->
+    <record id="rule_hotel_reservation_staff" model="ir.rule">
+        <field name="name">Staff: Own Reservations Only</field>
+        <field name="model_id" ref="model_hotel_reservation"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('group_hotel_user'))]"/>
+    </record>
+
+    <!-- Rule 2: Managers can see absolutely everything -->
+    <record id="rule_hotel_reservation_manager" model="ir.rule">
+        <field name="name">Manager: All Reservations</field>
+        <field name="model_id" ref="model_hotel_reservation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_hotel_manager'))]"/>
+    </record>
+</odoo>

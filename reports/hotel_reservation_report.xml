@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_hotel_reservation_invoice" model="ir.actions.report">
+        <field name="name">Hotel Invoice Summary</field>
+        <field name="model">hotel.reservation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hotel_mgmt.report_hotel_reservation_invoice</field>
+        <field name="report_file">hotel_mgmt.report_hotel_reservation_invoice</field>
+        <field name="binding_model_id" ref="model_hotel_reservation"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Hotel Invoice - %s' % (object.customer_id.name or object.display_name)</field>
+    </record>
+
+    <template id="report_hotel_reservation_invoice">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="o" t-value="doc"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row mb-4">
+                            <div class="col-7">
+                                <h2 class="mb-1">Hotel Invoice</h2>
+                                <p class="text-muted mb-0">
+                                    Reservation #<span t-field="doc.id"/>
+                                </p>
+                            </div>
+                            <div class="col-5 text-end">
+                                <strong>Status</strong>
+                                <div>
+                                    <span t-field="doc.state"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <h5>Guest</h5>
+                                <address class="mb-0">
+                                    <strong t-field="doc.customer_id.name"/>
+                                    <t t-if="doc.customer_id.phone">
+                                        <br/>
+                                        <span t-field="doc.customer_id.phone"/>
+                                    </t>
+                                    <t t-if="doc.customer_id.email">
+                                        <br/>
+                                        <span t-field="doc.customer_id.email"/>
+                                    </t>
+                                </address>
+                            </div>
+                            <div class="col-6">
+                                <h5>Stay Summary</h5>
+                                <table class="table table-sm table-borderless mb-0">
+                                    <tr>
+                                        <td class="ps-0">Room</td>
+                                        <td class="text-end pe-0">
+                                            <span t-field="doc.room_id.display_name"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-0">Check-in</td>
+                                        <td class="text-end pe-0">
+                                            <span t-field="doc.checkin_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-0">Check-out</td>
+                                        <td class="text-end pe-0">
+                                            <span t-field="doc.checkout_date"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-0">Nights</td>
+                                        <td class="text-end pe-0">
+                                            <span t-field="doc.night_count"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm o_main_table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th class="text-end">Nights</th>
+                                    <th class="text-end">Rate</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <strong>
+                                            Room <span t-field="doc.room_id.display_name"/>
+                                        </strong>
+                                        <div class="text-muted">
+                                            <span t-field="doc.room_id.room_type"/>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="doc.night_count"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="doc.price_per_night"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-field="doc.amount_subtotal"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <p class="text-muted">
+                                    This is a booking and invoice summary generated from the hotel reservation record.
+                                </p>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="text-end">Subtotal</td>
+                                        <td class="text-end">
+                                            <span t-field="doc.amount_subtotal"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-end">Discount</td>
+                                        <td class="text-end">
+                                            <span t-field="doc.discount_amount"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-end">
+                                            Tax (<span t-field="doc.tax_rate"/>%)
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="doc.tax_amount"/>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td class="text-end">
+                                            <strong>Amount Due</strong>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong t-field="doc.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
